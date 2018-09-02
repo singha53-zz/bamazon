@@ -15,30 +15,25 @@ connection.connect(err => {
   if (err) throw err;
   console.log('Connected to Database: connection id = ' + connection.threadId);
   displayItems();
-  connection.end();
 });
 
 function displayItems() {
   console.log('Items for sale');
-  connection.query(
-    'SELECT id, product_name, department_name, price FROM products',
-    (err, res) => {
-      console.table(res);
-      buyItems(res);
-    }
-  );
+  connection.query('SELECT * FROM products', (err, res) => {
+    console.table(res);
+    buyItems(res);
+  });
 }
 
 function buyItems(res) {
-  console.log('\n buy items:' + res);
   inquirer
     .prompt([
       {
         name: 'id',
         type: 'input',
         message: 'Enter ID of product you would like to buy?',
-        validate: function(value) {
-          return validateID(value, res);
+        validate: function(id) {
+          return validateID(id, res);
         }
       },
       {
@@ -51,18 +46,23 @@ function buyItems(res) {
     .then(answer => {
       console.log('item: ' + answer.id);
       console.log('quantity: ' + answer.quantity);
+      checkOrder((id = answer.id), (quantity = answer.quantity));
     });
 }
 
 function validateID(id, res) {
-  var ids = res.map(d => {return d.id})
-  if(!ids.includes(parseInt(id))){
-    console.log(`\n Id:${id} does not match any inventory ids...`)
+  var ids = res.map(d => {
+    return d.id;
+  });
+  if (!ids.includes(parseInt(id))) {
+    console.log(`\n id:${id} does not match any inventory ids...`);
   }
   if (
     isNaN(parseInt(id)) ||
     parseInt(id) === '' ||
-    !Number.isInteger(parseInt(id)) || !ids.includes(parseInt(id))) {
+    !Number.isInteger(parseInt(id)) ||
+    !ids.includes(parseInt(id))
+  ) {
     return 'Please enter a valid ID...';
   } else {
     return true;
@@ -81,4 +81,23 @@ function validateQuantity(quantity) {
   }
 }
 
-function checkOrder() {}
+function checkOrder(id, quantity) {
+  var query = 'SELECT * FROM products WHERE ?';
+  connection.query(
+    'SELECT * FROM products WHERE ?',
+    {
+      id: id
+    },
+    function(err, res) {
+      if (err) throw err;
+      var quantityInventory = parseInt(res[0].stock_quantity);
+      var quantityRequested = parseInt(quantity);
+      if (quantityRequested <= quantityInventory) {
+        console.log(`You have purchased ${quantityRequested} units of ${res[0].product_name} for a total cost of $${quantityRequested* parseFloat(res[0].price)}`)
+      } else {
+        console.log(`Insufficient quantity!`)
+      }
+    }
+  );
+  connection.end();
+}
