@@ -92,12 +92,37 @@ function checkOrder(id, quantity) {
       if (err) throw err;
       var quantityInventory = parseInt(res[0].stock_quantity);
       var quantityRequested = parseInt(quantity);
+      console.log(`quantity requested: ${quantityRequested}`);
+      console.log(`quantity inventory: ${quantityInventory}`);
       if (quantityRequested <= quantityInventory) {
-        console.log(`You have purchased ${quantityRequested} units of ${res[0].product_name} for a total cost of $${quantityRequested* parseFloat(res[0].price)}`)
+        console.log(
+          `You have purchased ${quantityRequested} units of ${
+            res[0].product_name
+          } for a total cost of $${quantityRequested *
+            parseFloat(res[0].price)}`
+        );
+        return updateQuantity(
+          (id = res[0].id),
+          (quantity = quantityInventory - quantityRequested)
+        );
       } else {
-        console.log(`Insufficient quantity!`)
+        console.log(`Insufficient quantity!`);
+        connection.end();
       }
     }
   );
+}
+
+function updateQuantity(id, quantity) {
+  connection.query('UPDATE products SET ? WHERE ?', [
+    {
+      stock_quantity: quantity
+    },
+    {
+      id: id
+    }
+  ], function(err, result){
+    if (err) throw err;
+  });
   connection.end();
 }
