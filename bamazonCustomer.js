@@ -39,7 +39,7 @@ function buyItems(res) {
       {
         name: 'quantity',
         type: 'input',
-        message: 'Enter how many unit you would like to buy?',
+        message: 'Enter how many unit(s) you would like to buy?',
         validate: validateQuantity
       }
     ])

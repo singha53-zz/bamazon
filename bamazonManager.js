@@ -41,17 +41,21 @@ function managerView() {
         case '2. View Low Inventory':
           return viewLowInventory();
         case '3. Add to Inventory':
-          return addItemQuantity();
+          return increaseQuantity();
         case '4. Add New Product':
           return addNewItem();
       }
     });
 }
 
-function viewProducts() {
+function displayProducts() {
   connection.query('SELECT * FROM products', (err, res) => {
     console.table(res);
   });
+}
+
+function viewProducts() {
+  displayProducts();
   connection.end();
 }
 
@@ -69,9 +73,103 @@ function viewLowInventory() {
   connection.end();
 }
 
-function addItemQuantity() {
-  console.log('addItemQuantity');
+function validateID(id, res) {
+  var ids = res.map(d => {
+    return d.id;
+  });
+  if (!ids.includes(parseInt(id))) {
+    console.log(`\n id:${id} does not match any inventory ids...`);
+  }
+  if (
+    isNaN(parseInt(id)) ||
+    parseInt(id) === '' ||
+    !Number.isInteger(parseInt(id)) ||
+    !ids.includes(parseInt(id))
+  ) {
+    return 'Please enter a valid ID...';
+  } else {
+    return true;
+  }
 }
+
+function validateQuantity(quantity) {
+  if (
+    isNaN(parseInt(quantity)) ||
+    parseInt(quantity) === '' ||
+    !Number.isInteger(parseInt(quantity))
+  ) {
+    return 'Quantity should be a number!';
+  } else {
+    return true;
+  }
+}
+
+function increaseQuantity() {
+  connection.query(
+    'SELECT * FROM products',
+    (err, res) => {
+      console.table(res);
+      increaseQuantity_userInput(res);
+    }
+  );
+}
+
+function increaseQuantity_userInput(res) {
+  inquirer
+    .prompt([
+      {
+        name: 'id',
+        type: 'input',
+        message: 'Enter ID of product you would like add more of...',
+        validate: function(id) {
+          return validateID(id, res);
+        }
+      },
+      {
+        name: 'quantity',
+        type: 'input',
+        message: 'Enter how many unit(s) you would like to add?',
+        validate: validateQuantity
+      }
+    ])
+    .then(answer => {
+      connection.query(
+        'SELECT * FROM products WHERE ?',
+        {
+          id: answer.id
+        },
+        function(err, res) {
+          if (err) throw err;
+increaseQuantity_update(id = answer.id, quantity=parseInt(answer.quantity), stockQuantity = parseInt(res[0].stock_quantity))
+        }
+      )
+    });
+}
+
+function increaseQuantity_update(id, quantity, stockQuantity) {
+  var quantityUpdate = stockQuantity + quantity
+  connection.query('UPDATE products SET ? WHERE ?', [
+    {
+      stock_quantity: quantityUpdate 
+    },
+    {
+      id: id
+    }
+  ], function(err, res){
+    if (err) throw err;
+  });
+  
+  // display table of products again
+  connection.query('SELECT * FROM products', (err, res) => {
+    console.table(res);
+    var updatedItem = res.filter(d => {return d.id === parseInt(id)})
+    
+    console.log(chalkPipe('blue.bold')(`You have added ${quantity} unit(s) of ${updatedItem[0].product_name} to the inventory for a total of ${updatedItem[0].stock_quantity} unit(s).`))
+  });
+
+  connection.end();
+}
+
 
 function addNewItem() {
   console.log('addNewItems');
