@@ -19,7 +19,7 @@ connection.connect(err => {
 
 function displayItems() {
   console.log('Items for sale');
-  connection.query('SELECT * FROM products', (err, res) => {
+  connection.query('SELECT id, product_name, department_name, price FROM products', (err, res) => {
     console.table(res);
     buyItems(res);
   });
@@ -44,8 +44,6 @@ function buyItems(res) {
       }
     ])
     .then(answer => {
-      console.log('item: ' + answer.id);
-      console.log('quantity: ' + answer.quantity);
       checkOrder((id = answer.id), (quantity = answer.quantity));
     });
 }
@@ -82,7 +80,6 @@ function validateQuantity(quantity) {
 }
 
 function checkOrder(id, quantity) {
-  var query = 'SELECT * FROM products WHERE ?';
   connection.query(
     'SELECT * FROM products WHERE ?',
     {
@@ -92,8 +89,7 @@ function checkOrder(id, quantity) {
       if (err) throw err;
       var quantityInventory = parseInt(res[0].stock_quantity);
       var quantityRequested = parseInt(quantity);
-      console.log(`quantity requested: ${quantityRequested}`);
-      console.log(`quantity inventory: ${quantityInventory}`);
+
       if (quantityRequested <= quantityInventory) {
         console.log(
           `You have purchased ${quantityRequested} units of ${
