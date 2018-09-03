@@ -67,6 +67,8 @@ function viewLowInventory() {
         console.log(
           chalkPipe('blue.bold')('No products have less than 5 units!')
         );
+      } else {
+        console.table(res);
       }
     }
   );
@@ -105,13 +107,10 @@ function validateQuantity(quantity) {
 }
 
 function increaseQuantity() {
-  connection.query(
-    'SELECT * FROM products',
-    (err, res) => {
-      console.table(res);
-      increaseQuantity_userInput(res);
-    }
-  );
+  connection.query('SELECT * FROM products', (err, res) => {
+    console.table(res);
+    increaseQuantity_userInput(res);
+  });
 }
 
 function increaseQuantity_userInput(res) {
@@ -140,37 +139,98 @@ function increaseQuantity_userInput(res) {
         },
         function(err, res) {
           if (err) throw err;
-increaseQuantity_update(id = answer.id, quantity=parseInt(answer.quantity), stockQuantity = parseInt(res[0].stock_quantity))
+          increaseQuantity_update(
+            (id = answer.id),
+            (quantity = parseInt(answer.quantity)),
+            (stockQuantity = parseInt(res[0].stock_quantity))
+          );
         }
-      )
+      );
     });
 }
 
 function increaseQuantity_update(id, quantity, stockQuantity) {
-  var quantityUpdate = stockQuantity + quantity
-  connection.query('UPDATE products SET ? WHERE ?', [
-    {
-      stock_quantity: quantityUpdate 
-    },
-    {
-      id: id
+  var quantityUpdate = stockQuantity + quantity;
+  connection.query(
+    'UPDATE products SET ? WHERE ?',
+    [
+      {
+        stock_quantity: quantityUpdate
+      },
+      {
+        id: id
+      }
+    ],
+    function(err, res) {
+      if (err) throw err;
     }
-  ], function(err, res){
-    if (err) throw err;
-  });
-  
+  );
+
   // display table of products again
   connection.query('SELECT * FROM products', (err, res) => {
     console.table(res);
-    var updatedItem = res.filter(d => {return d.id === parseInt(id)})
-    
-    console.log(chalkPipe('blue.bold')(`You have added ${quantity} unit(s) of ${updatedItem[0].product_name} to the inventory for a total of ${updatedItem[0].stock_quantity} unit(s).`))
+    var updatedItem = res.filter(d => {
+      return d.id === parseInt(id);
+    });
+
+    console.log(
+      chalkPipe('blue.bold')(
+        `You have added ${quantity} unit(s) of ${
+          updatedItem[0].product_name
+        } to the inventory for a total of ${
+          updatedItem[0].stock_quantity
+        } unit(s).`
+      )
+    );
   });
 
   connection.end();
 }
 
-
 function addNewItem() {
-  console.log('addNewItems');
+  inquirer
+    .prompt([
+      {
+        name: 'product_name',
+        type: 'input',
+        message: 'Enter new product name.'
+      },
+      {
+        name: 'department_name',
+        type: 'input',
+        message: 'Enter department designation of product.'
+      },
+      {
+        name: 'price',
+        type: 'input',
+        message: 'Enter price of product.'
+      },
+      {
+        name: 'quantity',
+        type: 'input',
+        message: 'Enter quantity of product.'
+      }
+    ])
+    .then(answer => {
+      console.log(answer);
+      insertItem(answer);
+    });
+}
+
+function insertItem(answer) {
+  
+  console.log(answer)
+
+  var query = "INSERT INTO products (product_name, department_name, price, stock_quantity) VALUES ('hi', 'hi', 23, 23)";
+  var values = [
+    [answer.product_name, answer.department_name, answer.price, answer.stock_quantity]
+  ]
+  console.log(values)
+  connection.query('INSERT INTO products (product_name, department_name, price, stock_quantity) VALUES ?', [[
+    [answer.product_name, answer.department_name, answer.price, answer.stock_quantity],
+  ]], (err, res) => {
+    if (err) throw err;
+    console.log(res);
+  });
+  connection.end();
 }
