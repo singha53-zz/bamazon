@@ -5,7 +5,8 @@ A command line interface application using nodeJS, LIRI: LIRI is a _Language_ In
 ## Installing
 ### Logging In to SQL Server
 - download MYSQL Workbench (https://dev.mysql.com/downloads/workbench/) and the MySQL Community Server (https://dev.mysql.com/downloads/mysql/)
-
+- Set up host, user and password by clicking on the "+" icon:
+![picture]("media/mysqlConnections.png")
 
 ```shell
 $ git clone https://github.com/singha53/bamazon.git
