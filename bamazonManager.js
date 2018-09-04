@@ -1,14 +1,16 @@
-var inquirer = require('inquirer');
-var mysql = require('mysql');
+require('dotenv').config();
+const keys = require('./keys.js');
+const inquirer = require('inquirer');
+const mysql = require('mysql');
 const cTable = require('console.table');
 const chalkPipe = require('chalk-pipe');
 
 var connection = mysql.createConnection({
-  host: 'localhost',
-  port: 3306,
-  user: 'root',
-  password: 'password',
-  database: 'bamazonDB'
+  host: keys.mysql.host,
+  port: parseInt(keys.mysql.port),
+  user: keys.mysql.username,
+  password: keys.mysql.password,
+  database: keys.mysql.database
 });
 
 // Connect to database

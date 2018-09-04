@@ -1,13 +1,15 @@
-var inquirer = require('inquirer');
-var mysql = require('mysql');
+require('dotenv').config();
+const keys = require('./keys.js');
+const inquirer = require('inquirer');
+const mysql = require('mysql');
 const cTable = require('console.table');
 
 var connection = mysql.createConnection({
-  host: 'localhost',
-  port: 3306,
-  user: 'root',
-  password: 'password',
-  database: 'bamazonDB'
+  host: keys.mysql.host,
+  port: parseInt(keys.mysql.port),
+  user: keys.mysql.username,
+  password: keys.mysql.password,
+  database: keys.mysql.database
 });
 
 // Connect to database
@@ -19,10 +21,13 @@ connection.connect(err => {
 
 function displayItems() {
   console.log('Items for sale');
-  connection.query('SELECT id, product_name, department_name, price FROM products', (err, res) => {
-    console.table(res);
-    buyItems(res);
-  });
+  connection.query(
+    'SELECT id, product_name, department_name, price FROM products',
+    (err, res) => {
+      console.table(res);
+      buyItems(res);
+    }
+  );
 }
 
 function buyItems(res) {
@@ -110,15 +115,19 @@ function checkOrder(id, quantity) {
 }
 
 function updateQuantity(id, quantity) {
-  connection.query('UPDATE products SET ? WHERE ?', [
-    {
-      stock_quantity: quantity
-    },
-    {
-      id: id
+  connection.query(
+    'UPDATE products SET ? WHERE ?',
+    [
+      {
+        stock_quantity: quantity
+      },
+      {
+        id: id
+      }
+    ],
+    function(err, result) {
+      if (err) throw err;
     }
-  ], function(err, result){
-    if (err) throw err;
-  });
+  );
   connection.end();
 }
