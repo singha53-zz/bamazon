@@ -1,16 +1,10 @@
 require('dotenv').config();
-const keys = require('./keys.js');
+const config = require('./config.js');
 const inquirer = require('inquirer');
 const mysql = require('mysql');
 const cTable = require('console.table');
-
-var connection = mysql.createConnection({
-  host: keys.mysql.host,
-  port: parseInt(keys.mysql.port),
-  user: keys.mysql.username,
-  password: keys.mysql.password,
-  database: keys.mysql.database
-});
+console.log(config)
+let connection = mysql.createConnection(config);
 
 // Connect to database
 connection.connect(err => {
