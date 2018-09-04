@@ -3,7 +3,6 @@ const config = require('./config.js');
 const inquirer = require('inquirer');
 const mysql = require('mysql');
 const cTable = require('console.table');
-console.log(config)
 let connection = mysql.createConnection(config);
 
 // Connect to database

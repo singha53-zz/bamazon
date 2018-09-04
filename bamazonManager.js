@@ -1,17 +1,10 @@
 require('dotenv').config();
-const keys = require('./keys.js');
+const config = require('./config.js');
 const inquirer = require('inquirer');
 const mysql = require('mysql');
 const cTable = require('console.table');
 const chalkPipe = require('chalk-pipe');
-
-var connection = mysql.createConnection({
-  host: keys.mysql.host,
-  port: parseInt(keys.mysql.port),
-  user: keys.mysql.username,
-  password: keys.mysql.password,
-  database: keys.mysql.database
-});
+let connection = mysql.createConnection(config);
 
 // Connect to database
 connection.connect(err => {
@@ -214,25 +207,30 @@ function addNewItem() {
       }
     ])
     .then(answer => {
-      console.log(answer);
       insertItem(answer);
     });
 }
 
 function insertItem(answer) {
-  
-  console.log(answer)
 
-  var query = "INSERT INTO products (product_name, department_name, price, stock_quantity) VALUES ('hi', 'hi', 23, 23)";
+  var query = "INSERT INTO products (product_name, department_name, price, stock_quantity) VALUES ?";
   var values = [
-    [answer.product_name, answer.department_name, answer.price, answer.stock_quantity]
+    [answer.product_name, answer.department_name, parseFloat(answer.price), parseInt(answer.quantity)]
   ]
-  console.log(values)
-  connection.query('INSERT INTO products (product_name, department_name, price, stock_quantity) VALUES ?', [[
-    [answer.product_name, answer.department_name, answer.price, answer.stock_quantity],
-  ]], (err, res) => {
+
+  connection.query(query, [values], (err, res) => {
     if (err) throw err;
-    console.log(res);
+
+    connection.query('SELECT * FROM products', (err, res) => {
+      console.table(res);
+  
+      console.log(
+        chalkPipe('blue.bold')(
+          `New item has been added!`
+        )
+      );
+    });
+    connection.end();
+
   });
-  connection.end();
 }
