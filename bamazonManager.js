@@ -198,12 +198,14 @@ function addNewItem() {
       {
         name: 'price',
         type: 'input',
-        message: 'Enter price of product.'
+        message: 'Enter price of product.',
+        validate: validatePrice
       },
       {
         name: 'quantity',
         type: 'input',
-        message: 'Enter quantity of product.'
+        message: 'Enter quantity of product.',
+        validate: validateQuantity
       }
     ])
     .then(answer => {
@@ -233,4 +235,15 @@ function insertItem(answer) {
     connection.end();
 
   });
+}
+
+function validatePrice(price) {
+  if (
+    isNaN(parseFloat(price)) ||
+    parseFloat(price) === ''
+  ) {
+    return 'Please enter valid price!';
+  } else {
+    return true;
+  }
 }
