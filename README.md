@@ -20,6 +20,8 @@ $ npm install
 
 ## Walkthroughs
 ### 1) Customer View:
+![Customer View GIF](https://github.com/singha53/bamazon/blob/master/media/bamazonCustomer.gif)
+
 
 ### 2) Manager View: 
 
