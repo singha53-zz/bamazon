@@ -22,8 +22,19 @@ $ npm install
 ### 1) Customer View:
 ![Customer View GIF](https://github.com/singha53/bamazon/blob/master/media/bamazonCustomer.gif)
 
-
 ### 2) Manager View: 
+
+* If a manager selects `View Products for Sale`, the app lists every available item: the item IDs, names, prices, and quantities.
+![View Products for Sale GIF](https://github.com/singha53/bamazon/blob/master/media/bamazonManager-viewProducts.gif)
+
+* If a manager selects `View Low Inventory`, the app lists all items with an inventory count lower than five.
+![View Low Inventory GIF](https://github.com/singha53/bamazon/blob/master/media/bamazonManager-lowInventory.gif)
+
+* If a manager selects `Add to Inventory`, the app displays a prompt that will let the manager "add more" of any item currently in the store.
+![Add to Inventory GIF](https://github.com/singha53/bamazon/blob/master/media/bamazonManager-increaseQuantity.gif)
+
+* If a manager selects `Add New Product`, the app will allow the manager to add a completely new product to the store.
+![Add New Product GIF](https://github.com/singha53/bamazon/blob/master/media/bamazonManager-addItem.gif)
 
 ## Programming Languages / Databases
 
